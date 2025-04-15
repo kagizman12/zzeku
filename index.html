@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zeku Asistan</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f1f5f9;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #chat {
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      height: 500px;
+      overflow-y: auto;
+    }
+    .msg {
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+    }
+    .user {
+      background-color: #4f46e5;
+      color: white;
+      align-self: flex-end;
+      text-align: right;
+    }
+    .ai {
+      background-color: #e2e8f0;
+      color: #1e293b;
+      align-self: flex-start;
+      text-align: left;
+    }
+    form {
+      margin-top: 1rem;
+      display: flex;
+      width: 100%;
+      max-width: 600px;
+    }
+    input {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 0.5rem 0 0 0.5rem;
+      border: 1px solid #cbd5e1;
+      outline: none;
+    }
+    button {
+      padding: 0.75rem 1.25rem;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 0 0.5rem 0.5rem 0;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Zeku GPT-4.1 Asistan</h1>
+  <div id="chat" style="display: flex; flex-direction: column;"></div>
+
+  <form id="chat-form">
+    <input type="text" id="message" placeholder="Mesajınızı yazın..." required />
+    <button type="submit">Gönder</button>
+  </form>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const form = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message');
+
+    function addMessage(content, type) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + type;
+      div.textContent = content;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function simulateAiResponse(userMessage) {
+      addMessage(userMessage, 'user');
+
+      try {
+        const response = await fetch("https://zzeku.onrender.com/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: userMessage })
+        });
+
+        const data = await response.json();
+        addMessage(data.reply, 'ai');
+      } catch (err) {
+        addMessage("Bir hata oluştu. Lütfen tekrar deneyin.", "ai");
+        console.error(err);
+      }
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const msg = messageInput.value.trim();
+      if (msg) {
+        simulateAiResponse(msg);
+        messageInput.value = '';
+      }
+    });
+  </script>
+
+</body>
+</html>
